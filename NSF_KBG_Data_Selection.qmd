@@ -1,10 +1,10 @@
 ---
 title: "NSF_KBG_Data_Selection"
 format: pdf
-authors: Nicole Sanchez Flores, Kimberly By Gotia
+authors: Nicole Sanchez Flores, Kimberly By Goytia
 ---
 
-• Group Members: Nicole
+• Group Members: Nicole Sanchez Flores and Kimberly By Goytia
 
 • Data: Describe the data that you plan to use and the place/site that you sourced it from.
 
