@@ -49,15 +49,19 @@ library(mosaic)
 #?HELPfull
 ```
 
-**Question to Research:**
+## **Data Description:** 
+
+-   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. 
+
+## **Question to Research:**
 
 -   Do age, gender, depression score, and homelessness predict primary substance type?
 
--   Exposures: Age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60) 
+-   Exposures: age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60) 
 
 -   Outcomes: The first substance an individual at the detoxification center has taken (prim_sub).
 
-**Descriptions of variables:**
+## **Descriptions of variables:**
 
 -   Depression levels (ces_d)
 
@@ -67,7 +71,7 @@ library(mosaic)
 
     -   The primary substance in this data set refers to the first drug of choice for the patient in the detoxification center. The drugs are categorized by levels with 0 = none, 1 = alcohol, 2 = cocaine, 3 = heroin, 4 = barbiturates, 5 = benzos, 6 = marijuana, 7 = methadone, and 8 = opiates.
 
-**References Summaries:**
+## **References Summaries:**
 
 1.  [Understanding drug use patterns among the homeless population: A systematic review of quantitative studies](https://www.sciencedirect.com/science/article/pii/S2667118223000107)
 
@@ -82,6 +86,8 @@ library(mosaic)
 3.  [Homelessness and Gender: Differences in Characteristics and Comorbidity of Substance Use Disorders at Admission to Services](https://www.researchgate.net/publication/366312084_Homelessness_and_Gender_Differences_in_Characteristics_and_Comorbidity_of_Substance_Use_Disorders_at_Admission_to_Services)
 
     1.  Summary: Study focuses on examining the associations between homelessness, gender, the severity of substance use, and the presence of mental health comorbidity among individuals entering treatment for SUD. After conducting a logistic regression on the 2017 Treatment Episodes dataset they found that individuals experiencing homelessness that admit into services have a higher usage rate of cocaine and meth, have higher frequency of use, and have higher rates of mental health comorbidity. Among their population they also found that women experiencing homelessness were highly associated with having mental health comorbidities. This research study helped in answering a question that bubbled up from our reading of, \"Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality\" where they found different influential factors impact initial drug use between men and women. We believe that mental health could be a factor that influences primary substance use so finding a paper that observed higher mental health comorbidities among homeless women that use substances is helpful to our research.
+
+## **Exploration of Data:** 
 
 **Depression levels (ces_d) general distribution count:**
 
@@ -167,3 +173,7 @@ ggplot(rehab, aes(x = ces_d, color = factor(home_label))) +
 ```
 
 -   Findings: This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
+
+## Outline of the Methodological Extension:
+
+-   
