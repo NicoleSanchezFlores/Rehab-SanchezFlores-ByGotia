@@ -4,7 +4,7 @@ format: pdf
 authors: Nicole Sanchez Flores, Kimberly By Gotia
 ---
 
-• Group Members: The names of all individuals in the project group.
+• Group Members: Nicole
 
 • Data: Describe the data that you plan to use and the place/site that you sourced it from.
 
