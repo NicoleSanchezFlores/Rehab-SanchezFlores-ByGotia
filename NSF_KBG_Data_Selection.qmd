@@ -10,14 +10,6 @@ authors: Nicole Sanchez Flores, Kimberly By Gotia
 
 We received the data from HELP
 
-Health Evaluation and Linkage to Primary Care (HELP): The HELP study was a clinical trial for
-adults undergoing in-patient detoxication from alcohol, heroin, or cocaine. Patients with no primary
-care physician were randomized to receive a multidisciplinary assessment and a brief motivational
-intervention or usual care, with the goal of linking patients to primary medical care. The primary
-outcome of interest was attendance at a primary care appointment within 12 months, as well as the
-time until that linkage occurred. A rich collection of patient information (including demographic
-information; substance use history and frequency; number of prior hospitalizations; perceptions of
-physical and metal health; and medical literacy) was also collected during the baseline assessment.
 
 
 • Research Question/Purpose: 
@@ -39,6 +31,11 @@ exposures and disease outcomes), examining possible missing data, or making visu
 library(readr)
 library(janitor)
 library(tidyverse)
+library(pheatmap)
+library(Hmisc)
+library(reshape2)
+
+
 rehab <-read_csv("help.csv")
 rehab <- clean_names(rehab)
 View(rehab)
@@ -85,3 +82,190 @@ extension is and how it builds on ideas from class and/or relates to the data yo
 
 
 
+
+The extension we aim to use is the 
+
+
+```{r}
+#variables
+all_varbs <-
+  rehab |>
+  select(c(age,a1, prim_sub,homeless, ces_d))
+
+all_varbs
+
+pheatmap(all_varbs, scale = "none")
+
+```
+
+
+* Correlation matrx of all variables
+- homelessness, age, gender
+
+
+```{r}
+# select variables
+all_varbs <- rehab |> 
+  select(age, a1, prim_sub, homeless, ces_d)
+
+cor_mat <- cor(all_varbs, use = "pairwise.complete.obs", method = "pearson")
+
+cor_mat
+
+
+pheatmap(cor_mat,
+         display_numbers = TRUE,  # show correlation values
+         color = colorRampPalette(c("white", "orange", "red"))(50),
+         fontsize_number = 10)
+
+
+cor_df <- melt(cor_mat) |>
+  filter(Var1 != Var2) |>
+  arrange(desc(abs(value)))
+
+head(cor_df, 10)
+
+
+```
+
+```{r}
+
+all_varbs <- rehab |> 
+  select(age, a1, prim_sub, homeless, ces_d)
+
+# rcorr gives correlation matrix + p-values
+corr_results <- rcorr(as.matrix(all_varbs))
+```
+
+Seems like age and prim_sub is sorrelated, mayhaps a1 and homelesss, ces_d and a1
+
+```{r}
+prim_sub_gender <-
+  rehab |>
+  ggplot(aes(x = prim_sub, fill = factor(a1, labels = c("Male", "Female")))) +
+  geom_histogram(binwidth = 1) +
+  labs(fill = "Gender")
+
+prim_sub_gender
+
+```
+
+
+
+
+
+```{r}
+rehab <- rehab |>
+  mutate(age_group = cut(age, breaks = c(18, 25, 35, 45, 55, 65),
+                         labels = c("18–24", "25–34", "35–44", "45–54", "55–64")))
+
+```
+
+```{r}
+rehab <- rehab |>
+  mutate(
+    prim_sub_label = factor(
+      prim_sub,
+      levels = 0:8,
+      labels = c(
+        "None",
+        "Alcohol",
+        "Cocaine",
+        "Heroin",
+        "Barbiturates",
+        "Benzos",
+        "Marijuana",
+        "Methadone",
+        "Opiates")
+      )
+    )
+```
+
+```{r}
+
+
+ggplot(rehab, aes(x = factor(prim_sub_label), fill = age_group)) +
+  geom_bar(position = "dodge") +
+  labs(x = "Primary Substance", y = "Count", fill = "Age Group") +
+  theme_minimal()
+
+```
+
+
+# By Gender
+```{r}
+rehab |>
+  ggplot(aes (x = factor((a1)))) +
+  geom_bar()
+
+
+rehab |>
+  group_by(a1) |>
+  count()
+```
+
+# Homelessness
+```{r}
+rehab |>
+  ggplot(aes (x = factor((homeless)))) +
+  geom_bar()
+
+
+rehab |>
+  group_by(homeless) |>
+  count()
+```
+
+
+```{r}
+rehab |>
+  ggplot(aes(x=prim_sub_label), fill = factor(homeless)) + 
+  geom_bar() 
+
+
+test <-
+  rehab |>
+  filter(homeless == 1 & prim_sub == 3) |>
+  count() 
+
+test_9 <-
+  rehab |>
+  filter(homeless == 0 & prim_sub == 3) |>
+  count()
+
+
+test_2 <-
+  rehab |>
+  filter(homeless == 1) |>
+  group_by(prim_sub) |>
+  count()
+
+
+test_3  <-
+  rehab |>
+  filter(homeless == 0) |>
+  group_by(prim_sub) |>
+  count()
+
+
+
+```
+
+
+
+Division of Labor "
+
+We will both ccreate different graphs required for understanding variables in depth from the multinomial results. We will both focus on different statistics for the multinoimnal logistric regression. Nicole will focus on the multinomial logistic regerssion model?
+
+Kim will focus on predicted probablitliies to further understand the model.Some of the packages we ill use is ``foreign``, ``nnet``, ``ggplot2``, ``reshape2``
+
+
+We will use multinominal logistic regression since our outcome in this case is a categorical variable with no real order, ex: 1 = Alcohol.
+
+
+
+
+
+
+
+* 
