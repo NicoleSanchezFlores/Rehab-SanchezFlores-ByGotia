@@ -1,0 +1,179 @@
+```{r}
+library(readr)
+library(janitor)
+library(tidyverse)
+rehab <-read_csv("help.csv")
+rehab <- clean_names(rehab)
+
+rehab <- rehab |> mutate(
+    prim_sub_label = factor(
+      prim_sub,
+      levels = 0:8,
+      labels = c(
+        "None",
+        "Alcohol",
+        "Cocaine",
+        "Heroin",
+        "Barbiturates",
+        "Benzos",
+        "Marijuana",
+        "Methadone",
+        "Opiates"
+        )
+      )
+    )
+
+rehab <- rehab |> mutate(
+    home_label = factor(
+      homeless,
+      levels = 0:1,
+      labels = c(
+        "No",
+        "Yes"
+        )
+      )
+    )
+
+rehab <- rehab |> mutate(
+    gender_label = factor(
+      a1,
+      levels = 1:2,
+      labels = c(
+        "Male",
+        "Female"
+        )
+      )
+    )
+
+library(mosaic)
+#?HELPfull
+```
+
+## **Data Description:** 
+
+-   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. 
+
+## **Question to Research:**
+
+-   Do age, gender, depression score, and homelessness predict primary substance type?
+
+-   Exposures: age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60) 
+
+-   Outcomes: The first substance an individual at the detoxification center has taken (prim_sub).
+
+## **Descriptions of variables:**
+
+-   Depression levels (ces_d)
+
+    -   Depression levels in patients in the detoxification center are measured using the Center for Epidemiological Studies depression measure which ranges from 0-60. Patients with higher scores are deemed to have more depressive symptoms.
+
+-   Primary substance (prim_sub)
+
+    -   The primary substance in this data set refers to the first drug of choice for the patient in the detoxification center. The drugs are categorized by levels with 0 = none, 1 = alcohol, 2 = cocaine, 3 = heroin, 4 = barbiturates, 5 = benzos, 6 = marijuana, 7 = methadone, and 8 = opiates.
+
+## **References Summaries:**
+
+1.  [Understanding drug use patterns among the homeless population: A systematic review of quantitative studies](https://www.sciencedirect.com/science/article/pii/S2667118223000107)
+
+    -   Summary: Researchers conducted a systematic review of quantitative studies from 2007 and 2020 to assess the trends associated with substance abuse among the global adult homeless population. They found that alcohol was a highly popular primary drug abuse substance, but overtime there was an emergence in psychoactive substance use as well. Substance abuse was also found to be more common among men due to mental health and trauma stressors. 
+
+2.  [Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality](https://www.mdpi.com/2156748)
+
+    -   Summary: This paper focuses on a cross sectional study observing whether there is a statistical difference in drug consumption between homeless men and women in Spanish shelters. They also assess whether there is higher drug usage present among homeless Spanish nationals or immigrants. After conducting the study they found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they found that the reason behind initial drug use did differ. Women tended to initially use drugs due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors. We found the difference in initial drug use between men and women to be very interesting especially as we examine whether factors like depression score influence an individual\'s primary substance in the HELP data.
+
+    -   Additionally, their investigation into whether or not there was a difference in drug risk among homeless Spanish nationals and immigrants found that Spanish nationals were statistically at a higher tendency of drug use compared to immigrants. This section of the research paper seemed compelling for future investigation of whether primary substance differs among homeless populations across the U.S depending on their geographic location. The HELP data does not account for geographic information at this time so for now this is more of a future expansion of our research.
+
+3.  [Homelessness and Gender: Differences in Characteristics and Comorbidity of Substance Use Disorders at Admission to Services](https://www.researchgate.net/publication/366312084_Homelessness_and_Gender_Differences_in_Characteristics_and_Comorbidity_of_Substance_Use_Disorders_at_Admission_to_Services)
+
+    1.  Summary: Study focuses on examining the associations between homelessness, gender, the severity of substance use, and the presence of mental health comorbidity among individuals entering treatment for SUD. After conducting a logistic regression on the 2017 Treatment Episodes dataset they found that individuals experiencing homelessness that admit into services have a higher usage rate of cocaine and meth, have higher frequency of use, and have higher rates of mental health comorbidity. Among their population they also found that women experiencing homelessness were highly associated with having mental health comorbidities. This research study helped in answering a question that bubbled up from our reading of, \"Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality\" where they found different influential factors impact initial drug use between men and women. We believe that mental health could be a factor that influences primary substance use so finding a paper that observed higher mental health comorbidities among homeless women that use substances is helpful to our research.
+
+## **Exploration of Data:** 
+
+**Depression levels (ces_d) general distribution count:**
+
+```{r}
+ggplot(rehab, aes(x = ces_d)) + 
+  geom_bar() + 
+  labs(title = "CES Score Distribution", x = "Score", y = "Total Count") + 
+  theme_minimal()
+summary(rehab$ces_d)
+```
+
+-   Findings: The CES depression scores tend to peak towards the 30-40 score range. This indicates high frequency of mid-range depression symptoms among the population in the HELP data set. This mid-range score finding is also supported by the summary statistics for CES-D scores which indicate a mean of 32.86.
+
+**Primary substance (prim_sub) general distribution count:**
+
+```{r}
+ggplot(rehab, aes(x = factor(prim_sub_label))) + 
+  geom_bar() + 
+  labs(title = "Primary Substance Distribution", x = "Primary Substance", y = "Total Count") + 
+  theme_minimal()
+
+summary(rehab$prim_sub)
+rehab |>
+  group_by(prim_sub) |>
+  count()
+```
+
+-   Findings: The primary substance with high usage rates among the HELP population is alcohol with the lowest being marijuana. Further information on the exact distribution counts can be found in the summary count of each primary substance group with alcohol having 185 users and marijuana only having 1. It should also be noted that responses to "None", "Barbiturates", "Benzos", "Methadone", and "Opiates" were left off because no patients in the detoxification center responded to those options as their primary substance.
+
+**Depression Score in association with Primary Substance:**
+
+```{r}
+ggplot(rehab, aes(x = factor(prim_sub_label), y = ces_d, fill = factor(prim_sub_label))) + 
+  geom_boxplot() + 
+  labs(title = "Depression Score Grouped by Primary Substance", 
+       x = "Primary Substance", 
+       y = "CES-D Score") + 
+  theme_minimal() + 
+  theme(legend.position = "none")
+```
+
+-   Findings: After grouping depression score by the different primary substances used by the detoxification patients we found that alcohol tended to have a higher mean depression score (\>35) compared to cocaine and heroine. We also saw that in terms of variance cocaine had a wider range of variance extending to the highest score of 60 indicating a high instance of depression symptoms.
+
+**Depression Score in association with Gender:**
+
+```{r}
+ggplot(rehab, aes(x = factor(gender_label), y = ces_d, fill = factor(gender_label))) + 
+  geom_boxplot() + 
+  labs(title = "Depression Score Grouped by Gender", 
+       x = "Gender", 
+       y = "CES-D Score") + 
+  theme_minimal() + 
+  theme(legend.position = "none")
+```
+
+-   Findings: When evaluating the depression levels of men versus women in the detoxification center we found that women had a higher depression scores overall. Women had a mean score of \>35 compared to men who scored \~30.
+
+**Homelessness in association with Gender:**
+
+```{r}
+ggplot(rehab, aes(x = factor(gender_label), fill = factor(home_label))) + 
+  geom_bar(position = "dodge") + 
+  labs(title = "Homlessness Distribution Grouped by Gender", 
+       x = "Gender", 
+       y = "Total Count",
+       fill = "Homeless") + 
+  theme_minimal() 
+```
+
+-   Findings: From this bar plot we can see that for both categories of homelessness men tend to be more represented overall in the HELP data set. However, within the male population there is a close tie between those that are homeless and those that are not. For women this is not the case. Women who are not homeless are at a higher proportion than those that are in the detoxification center.
+
+**Depression Score and Homelessness grouped by Primary Substance:**
+
+```{r}
+ggplot(rehab, aes(x = ces_d, color = factor(home_label))) + 
+  geom_density() + 
+  facet_wrap(~ prim_sub_label) + 
+  labs(title = "Depression Score Grouped by Homelessness Across Primary Substances", 
+       x = "CES-D Score",
+       color = "Homeless"
+  ) + 
+  theme_minimal()
+```
+
+-   Findings: This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
+
+## Outline of the Methodological Extension:
+
+-   
