@@ -51,13 +51,13 @@ library(mosaic)
 
 ## **Data Description:** 
 
--   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. 
+-   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit.
 
 ## **Question to Research:**
 
 -   Do age, gender, depression score, and homelessness predict primary substance type?
 
--   Exposures: age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60) 
+-   Exposures: age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60)
 
 -   Outcomes: The first substance an individual at the detoxification center has taken (prim_sub).
 
