@@ -1,32 +1,47 @@
 ---
-title: "NSF_KBG_Data_Selection"
+title: "Topic and Data Selection"
 format: pdf
-authors: Nicole Sanchez Flores, Kimberly By Goytia
+authors: Nicole Sanchez Flores, Kimberly By Gotia
+
 ---
 
-• Group Members: Nicole Sanchez Flores and Kimberly By Goytia
+*Group Members*: Nicole Sanchez Flores, Kimberly By Gotia
 
-• Data: Describe the data that you plan to use and the place/site that you sourced it from.
+## *Data:*
 
-We received the data from HELP
-
-
-
-• Research Question/Purpose: 
-
-What specific research question(s) do you hope to answer/what specifi-
-cally do you hope to learn from analyzing these data? You should clearly identify the disease outcome
-and the exposure(s) of interest, as well as which variables in the data you will use to measure them.
-
-• Exploratory Data Analysis:
-
-To support your argument that you can use this data to address your
-research question (and as proof that you can read in the data!), conduct a brief exploratory analysis
-of the dataset. You might consider reporting relevant summary statistics (such as the sample size,
-measures of center and spread for relevant continuous exposures, and contingency tables for categorical
-exposures and disease outcomes), examining possible missing data, or making visualizations of the data.
+-   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit.
 
 
+
+## *Research Question/Purpose*: 
+
+Does age, gender, depression score, and homelessness predict primary substance type?
+Exposures: Age, a1 (gender represented by 1 = male and 2 = female), homeless (related to homeless status with 0  = no and 1 = yes),  and ces_d (center for epidemiologic studies depression measure 0-60) 
+Outcomes: The first substance an individual at the detoxification center has taken (prim_sub).
+
+## **Descriptions of variables:**
+
+-   Depression levels (ces_d)
+
+    -   Depression levels in patients in the detoxification center are measured using the Center for Epidemiological Studies depression measure which ranges from 0-60. Patients with higher scores are deemed to have more depressive symptoms.
+
+-   Primary substance (prim_sub)
+
+    -   The primary substance in this data set refers to the first drug of choice for the patient in the detoxification center. The drugs are categorized by levels with 0 = none, 1 = alcohol, 2 = cocaine, 3 = heroin, 4 = barbiturates, 5 = benzos, 6 = marijuana, 7 = methadone, and 8 = opiates.
+    
+-   Age (age)
+
+    -   Age is coded as a continuous numeric measure, and it represents the age the participant was at the time of entering the rehab service.
+
+-   Gender (a1) 
+
+    -   Gender is a binary categorical variable in this dataset, where 1 = male and 2 = female. This variable helps us explore whether primary substance choice or depression levels can  differ between men and women in the HELP study, among other explorations. 
+    
+-   Homelessness (homeless)
+
+    -   Homeless is a binary categorical variable which indicates whether the participant was experiencing homelessness at the time of the study. 0 indicates no homelessness while 1 indicates homelessness
+
+    
 ```{r, echo=FALSE, include=FALSE}
 library(readr)
 library(janitor)
@@ -34,136 +49,15 @@ library(tidyverse)
 library(pheatmap)
 library(Hmisc)
 library(reshape2)
-
-
+library(knitr)
+library(readr)
+library(janitor)
+library(tidyverse)
+library(kableExtra)
 rehab <-read_csv("help.csv")
 rehab <- clean_names(rehab)
-View(rehab)
 
-
-```
-
-
-
-```{r}
-age_bar_original <-
-  ggplot(aes(x=age), data = rehab) +
-  geom_bar()
-
-age_bar_original
-```
-
-```{r}
-ggplot(rehab, aes(x = age)) +
-  geom_histogram(binwidth = 5) +
-  theme_minimal() +
-  labs(title = "Age Distribution (10-year increments)",
-       x = "Age", y = "Count")
-
-ggplot(rehab, aes(x = age)) +
-  geom_boxplot()
-
-summary(rehab$age)
-
-```
- 
- 
-Age seems to be slightly right skewed. The mean is 35 and the median is also 35. Though its slightly right skewed age seems to be more 
-
-
-
-• Outline of the Methodological Extension: 
-
-You should describe how you plan to divide the labor of
-learning a new topic: who will do what? You should identify at least two resources that you will use
-to learn about your topic, as well as the R package(s) or function(s) that you feel will be relevant to
-applying this method. You will also provide a short (two to four sentence) description of what your
-extension is and how it builds on ideas from class and/or relates to the data you intend to analyze.
-
-
-
-
-The extension we aim to use is the 
-
-
-```{r}
-#variables
-all_varbs <-
-  rehab |>
-  select(c(age,a1, prim_sub,homeless, ces_d))
-
-all_varbs
-
-pheatmap(all_varbs, scale = "none")
-
-```
-
-
-* Correlation matrx of all variables
-- homelessness, age, gender
-
-
-```{r}
-# select variables
-all_varbs <- rehab |> 
-  select(age, a1, prim_sub, homeless, ces_d)
-
-cor_mat <- cor(all_varbs, use = "pairwise.complete.obs", method = "pearson")
-
-cor_mat
-
-
-pheatmap(cor_mat,
-         display_numbers = TRUE,  # show correlation values
-         color = colorRampPalette(c("white", "orange", "red"))(50),
-         fontsize_number = 10)
-
-
-cor_df <- melt(cor_mat) |>
-  filter(Var1 != Var2) |>
-  arrange(desc(abs(value)))
-
-head(cor_df, 10)
-
-
-```
-
-```{r}
-
-all_varbs <- rehab |> 
-  select(age, a1, prim_sub, homeless, ces_d)
-
-# rcorr gives correlation matrix + p-values
-corr_results <- rcorr(as.matrix(all_varbs))
-```
-
-Seems like age and prim_sub is sorrelated, mayhaps a1 and homelesss, ces_d and a1
-
-```{r}
-prim_sub_gender <-
-  rehab |>
-  ggplot(aes(x = prim_sub, fill = factor(a1, labels = c("Male", "Female")))) +
-  geom_histogram(binwidth = 1) +
-  labs(fill = "Gender")
-
-prim_sub_gender
-
-```
-
-
-
-
-
-```{r}
-rehab <- rehab |>
-  mutate(age_group = cut(age, breaks = c(18, 25, 35, 45, 55, 65),
-                         labels = c("18–24", "25–34", "35–44", "45–54", "55–64")))
-
-```
-
-```{r}
-rehab <- rehab |>
-  mutate(
+rehab <- rehab |> mutate(
     prim_sub_label = factor(
       prim_sub,
       levels = 0:8,
@@ -176,96 +70,327 @@ rehab <- rehab |>
         "Benzos",
         "Marijuana",
         "Methadone",
-        "Opiates")
+        "Opiates"
+        )
       )
     )
+
+rehab <- rehab |> mutate(
+    home_label = factor(
+      homeless,
+      levels = 0:1,
+      labels = c(
+        "No",
+        "Yes"
+        )
+      )
+    )
+
+rehab <- rehab |> mutate(
+    gender_label = factor(
+      a1,
+      levels = 1:2,
+      labels = c(
+        "Male",
+        "Female"
+        )
+      )
+    )
+
+library(mosaic)
+#?HELPfull
+knitr::opts_chunk$set(
+echo = FALSE,
+message = FALSE,
+warning = FALSE
+)
 ```
 
+
+
+
+
+## **Exploration of Data:** 
+**Depression levels (ces_d) general distribution count:**
 ```{r}
+ggplot(rehab, aes(x = ces_d)) + 
+  geom_bar() + 
+  labs(title = "CES Score Distribution", x = "Score", y = "Total Count") + 
+  theme_minimal()
+
+summary(rehab$ces_d)
+```
+-   Findings: The CES depression scores tend to peak towards the 30-40 score range. This indicates high frequency of mid-range depression symptoms among the population in the HELP data set. This mid-range score finding is also supported by the summary statistics for CES-D scores which indicate a mean of 32.86.
 
 
-ggplot(rehab, aes(x = factor(prim_sub_label), fill = age_group)) +
+**Primary substance (prim_sub) general distribution count:**
+```{r}
+ggplot(rehab, aes(x = factor(prim_sub_label))) + 
+  geom_bar() + 
+  labs(title = "Primary Substance Distribution", x = "Primary Substance", y = "Total Count") + 
+  theme_minimal()
+
+summary(rehab$prim_sub)
+rehab |>
+  group_by(prim_sub) |>
+  count()
+```
+
+
+**Gender Distribution**
+```{r}
+rehab |>
+  ggplot(aes(x = gender_label)) +
+  geom_bar() +
+  geom_text(stat = "count",
+            aes(label = ..count..),
+            vjust = -0.5) +
+  labs(title = "Gender Distribution",
+       x = "Gender",
+       y = "Count")
+rehab |>
+  group_by(gender_label) |>
+  count()
+```
+- Findings: From the bar graph and from the counts we can see that the majority of the participants are male (n = 359) and a smaller proportion of the particpants are female (n = 111). This  implies that men use rehab services more frequently in this sample, which is consistent with larger national trends in admissions to drug treatment programs, as we explored in our research.  This is important to note  when investigating associations with primary substance type, since gender representation may influence both substance use trends and mental health characteristics in the dataset.
+
+**Homelessness**
+```{r}
+rehab |>
+  ggplot(aes(x = factor(homeless))) +
+  geom_bar() +
+  geom_text(stat = "count",
+            aes(label = ..count..),
+            vjust = -0.5) +
+  labs(title = "Homelessness Distribution",
+       x = "Homeless (0 = No, 1 = Yes)",
+       y = "Count")
+rehab |>
+  group_by(home_label) |>
+  count()
+
+```
+- Findings: We can see that the homelessness status in the sample seems to be evenly divided, with 251 participants reporting they were not homeless and 219 reporting homelessness. With a relatively high proportion of participants identifying as homeless, it can lead to further investigation for homelessness as an explanatory variable. It may reflect the population's heightened susceptibility to substance use disorders.
+
+**Age**
+```{r}
+age_bar_10 <-
+  ggplot(rehab, aes(x = age)) +
+  geom_histogram(binwidth = 5) +
+  theme_minimal() +
+  labs(title = "Age Distribution (10-year increments)",
+       x = "Age", y = "Count")
+age_bar_10
+
+ggplot(rehab, aes(x = age)) +
+  geom_boxplot()
+
+  summary(rehab$age)
+```
+ 
+- Findings: The age distribution of participants falls mostly between the ages of 25 and 45, with fewer people at the younger (18-24) and older (55-64) sides of the range.  The median age is 35, while the mean age is 35.75, indicating a somewhat right skewed distribution.  This shows that the majority of people seeking rehab services are in their early to mid-adult years, which may have an impact on the link between age and primary substance type.
+
+**Correlation Matrix**
+```{r}
+# select variables
+all_varbs <- rehab |> 
+  select(age, a1, prim_sub, homeless, ces_d)
+
+cor_mat <- cor(all_varbs, use = "pairwise.complete.obs", method = "pearson")
+
+pheatmap(cor_mat,
+         display_numbers = TRUE,  # show correlation values
+         color = colorRampPalette(c("white", "orange", "red"))(50),
+         fontsize_number = 10)
+
+
+cor_df <- melt(cor_mat) |>
+  filter(Var1 != Var2) |>
+  arrange(desc(abs(value)))
+
+
+```
+*- Findings:*
+
+- Age and primary substance (r ≈ −0.27):
+Older participants tend to use substances that have lower numeric codes in the data (e.g., more alcoho, since alcohol is coded as 1l vs. cocaine, coded as 2), although this requires more careful interpretation due to coding.
+
+- Gender and CES-D (r ≈ 0.18):
+Females appear to have higher depression scores on average.
+
+- Homelessness and primary substance (r ≈ −0.16):
+Homelessness status shows moderate association with substance type.
+```{r}
+all_varbs <- rehab |> 
+  select(age, a1, prim_sub, homeless, ces_d)
+
+# rcorr gives correlation matrix + p-values
+corr_results <- rcorr(as.matrix(all_varbs))
+
+kable(corr_results$r, caption = "Correlation Matrix (r)")
+kable(corr_results$P, caption = "P-values")
+
+
+```
+
+
+
+```{r, echo=FALSE, include=FALSE}
+rehab <- rehab |>
+  mutate(age_group = cut(age, breaks = c(18, 25, 35, 45, 55, 65),
+                         labels = c("18–24", "25–34", "35–44", "45–54", "55–64")))
+
+```
+
+
+```{r,warning=FALSE,echo=FALSE}
+
+prim_sub_age <-
+  ggplot(rehab, aes(x = factor(prim_sub_label), fill = age_group)) +
   geom_bar(position = "dodge") +
   labs(x = "Primary Substance", y = "Count", fill = "Age Group") +
   theme_minimal()
 
+prim_sub_age
 ```
+-   Findings: Primary substance use patterns vary by age group.  Alcohol use is most common in all age groups, but it's particularly prevalent among those aged 35-44 and 45-54.  Cocaine and heroin use appear to be more evenly distributed across age groups, but younger groups (18-24 and 25-34) having slightly higher cocaine use.  Marijuana use is extremely low in all age groups (there seems to just be one instance of it).  These patterns indicate that age may have a significant influence on the primary substance use variable, which reinforces the need to include age as a predictor in our multinomial model.
 
-
-# By Gender
+**Depression Score in association with Primary Substance:**
 ```{r}
-rehab |>
-  ggplot(aes (x = factor((a1)))) +
-  geom_bar()
-
-
-rehab |>
-  group_by(a1) |>
-  count()
+ggplot(rehab, aes(x = factor(prim_sub_label), y = ces_d, fill = factor(prim_sub_label))) + 
+  geom_boxplot() + 
+  labs(title = "Depression Score Grouped by Primary Substance", 
+       x = "Primary Substance", 
+       y = "CES-D Score") + 
+  theme_minimal() + 
+  theme(legend.position = "none")
 ```
+-   Findings: After grouping depression score by the different primary substances used by the detoxification patients we found that alcohol tended to have a higher mean depression score (\>35) compared to cocaine and heroine. We also saw that in terms of variance cocaine had a wider range of variance extending to the highest score of 60 indicating a high instance of depression symptoms.
 
-# Homelessness
+**Depression Score in association with Gender:**
 ```{r}
-rehab |>
-  ggplot(aes (x = factor((homeless)))) +
-  geom_bar()
-
-
-rehab |>
-  group_by(homeless) |>
-  count()
+ggplot(rehab, aes(x = factor(gender_label), y = ces_d, fill = factor(gender_label))) + 
+  geom_boxplot() + 
+  labs(title = "Depression Score Grouped by Gender", 
+       x = "Gender", 
+       y = "CES-D Score") + 
+  theme_minimal() + 
+  theme(legend.position = "none")
 ```
+
+-   Findings: When evaluating the depression levels of men versus women in the detoxification center we found that women had a higher depression scores overall. Women had a mean score of \>35 compared to men who scored \~30.
+
+**Homelessness in association with Gender:**
+```{r}
+ggplot(rehab, aes(x = factor(gender_label), fill = factor(home_label))) + 
+  geom_bar(position = "dodge") + 
+  labs(title = "Homlessness Distribution Grouped by Gender", 
+       x = "Gender", 
+       y = "Total Count",
+       fill = "Homeless") + 
+  theme_minimal() 
+```
+-   Findings: From this bar plot we can see that for both categories of homelessness men tend to be more represented overall in the HELP data set. However, within the male population there is a close tie between those that are homeless and those that are not. For women this is not the case. Women who are not homeless are at a higher proportion than those that are in the detoxification center.
+
+**Depression Score and Homelessness grouped by Primary Substance:**
+```{r}
+ggplot(rehab, aes(x = ces_d, color = factor(home_label))) + 
+  geom_density() + 
+  facet_wrap(~ prim_sub_label) + 
+  labs(title = "Depression Score Grouped by Homelessness Across Primary Substances", 
+       x = "CES-D Score",
+       color = "Homeless"
+  ) + 
+  theme_minimal()
+```
+-   Findings: This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
+
+## Outline of the Methodological Extension: 
+```{r}
+#variables
+all_varbs <-
+  rehab |>
+  select(c(age,a1, prim_sub,homeless, ces_d))
+
+all_varbs
+```
+
+```{r}
+# prim_sub_gender <-
+#   rehab |>
+#   ggplot(aes(x = prim_sub, fill = factor(a1, labels = c("Male", "Female")))) +
+#   geom_histogram(binwidth = 1) +
+#   labs(fill = "Gender")
+# 
+# prim_sub_gender
+
+```
+
+
+1.  [Understanding drug use patterns among the homeless population: A systematic review of quantitative studies](https://www.sciencedirect.com/science/article/pii/S2667118223000107)
+
+    -   Summary: Researchers conducted a systematic review of quantitative studies from 2007 and 2020 to assess the trends associated with substance abuse among the global adult homeless population. They found that alcohol was a highly popular primary drug abuse substance, but overtime there was an emergence in psychoactive substance use as well. Substance abuse was also found to be more common among men due to mental health and trauma stressors.
+
+2.  [Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality](https://www.mdpi.com/2156748)
+
+    -   Summary: This paper focuses on a cross sectional study observing whether there is a statistical difference in drug consumption between homeless men and women in Spanish shelters. They also assess whether there is higher drug usage present among homeless Spanish nationals or immigrants. After conducting the study they found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they found that the reason behind initial drug use did differ. Women tended to initially use drugs due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors. We found the difference in initial drug use between men and women to be very interesting especially as we examine whether factors like depression score influence an individual\'s primary substance in the HELP data.
+
+    -   Additionally, their investigation into whether or not there was a difference in drug risk among homeless Spanish nationals and immigrants found that Spanish nationals were statistically at a higher tendency of drug use compared to immigrants. This section of the research paper seemed compelling for future investigation of whether primary substance differs among homeless populations across the U.S depending on their geographic location. The HELP data does not account for geographic information at this time so for now this is more of a future expansion of our research.
+
+3.  [Homelessness and Gender: Differences in Characteristics and Comorbidity of Substance Use Disorders at Admission to Services](https://www.researchgate.net/publication/366312084_Homelessness_and_Gender_Differences_in_Characteristics_and_Comorbidity_of_Substance_Use_Disorders_at_Admission_to_Services)
+
+    1.  Summary: Study focuses on examining the associations between homelessness, gender, the severity of substance use, and the presence of mental health comorbidity among individuals entering treatment for SUD. After conducting a logistic regression on the 2017 Treatment Episodes dataset they found that individuals experiencing homelessness that admit into services have a higher usage rate of cocaine and meth, have higher frequency of use, and have higher rates of mental health comorbidity. Among their population they also found that women experiencing homelessness were highly associated with having mental health comorbidities. This research study helped in answering a question that bubbled up from our reading of, \"Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality\" where they found different influential factors impact initial drug use between men and women. We believe that mental health could be a factor that influences primary substance use so finding a paper that observed higher mental health comorbidities among homeless women that use substances is helpful to our research.
+
+We will both create different graphs required for understanding the variables in depth from the multinomial results. We will both focus on different statistics for the multinomial logistic regression. Nicole will focus on the multinomial logistic regression model, and Kim will focus on predicted probabilities to further understand the model. Some of the packages we will use include foreign, nnet, ggplot2, and reshape2.
+
+We will use multinomial logistic regression since our outcome in this case is a categorical variable with no real order, such as 1 = Alcohol. This extension will help us to investigate how age, gender, depression levels, and homelessness influence the likelihood of selecting each primary substance.
+
+* nnet: includes the multinom() function, which is what we need for fitting a multinomial logistic regression model.  Since our outcome variable (prim_sub) has several unsorted categories (alcohol, cocaine, heroin, etc.), nnet is needed for calculating how age, gender, homelessness, and depression scores influence the probability of each substance category.
+
+* reshape2: We will need reshape2 for predicted probablilities since it elps transform data  for preparing tables or probability outputs that we will use from the multinomial model.  The predicted probabilities for each substance category in prim_sub may need to be changed before we plot them.
+
+* ggplot2: This package will be needed for visualizations so we can better understand how our model fits, or explore variables before the model. We will use it for bar plots, boxplots, histograms, and predicted-probability graphs.
+
 
 
 ```{r}
-rehab |>
-  ggplot(aes(x=prim_sub_label), fill = factor(homeless)) + 
-  geom_bar() 
-
-
-test <-
-  rehab |>
-  filter(homeless == 1 & prim_sub == 3) |>
-  count() 
-
-test_9 <-
-  rehab |>
-  filter(homeless == 0 & prim_sub == 3) |>
-  count()
-
-
-test_2 <-
-  rehab |>
-  filter(homeless == 1) |>
-  group_by(prim_sub) |>
-  count()
-
-
-test_3  <-
-  rehab |>
-  filter(homeless == 0) |>
-  group_by(prim_sub) |>
-  count()
-
-
-
+# ```{r}
+# rehab |>
+#   ggplot(aes(x=prim_sub_label), fill = factor(homeless)) + 
+#   geom_bar() 
+# 
+# 
+# test <-
+#   rehab |>
+#   filter(homeless == 1 & prim_sub == 3) |>
+#   count() 
+# 
+# test_9 <-
+#   rehab |>
+#   filter(homeless == 0 & prim_sub == 3) |>
+#   count()
+# 
+# 
+# test_2 <-
+#   rehab |>
+#   filter(homeless == 1) |>
+#   group_by(prim_sub) |>
+#   count()
+# 
+# 
+# test_3  <-
+#   rehab |>
+#   filter(homeless == 0) |>
+#   group_by(prim_sub) |>
+#   count()
+# 
+# 
+# 
+# ```
+knitr::opts_chunk$set(
+echo = FALSE,
+message = FALSE,
+warning = FALSE
+)
 ```
 
-
-
-Division of Labor "
-
-We will both ccreate different graphs required for understanding variables in depth from the multinomial results. We will both focus on different statistics for the multinoimnal logistric regression. Nicole will focus on the multinomial logistic regerssion model?
-
-Kim will focus on predicted probablitliies to further understand the model.Some of the packages we ill use is ``foreign``, ``nnet``, ``ggplot2``, ``reshape2``
-
-
-We will use multinominal logistic regression since our outcome in this case is a categorical variable with no real order, ex: 1 = Alcohol.
-
-
-
-
-
-
-
-* 
