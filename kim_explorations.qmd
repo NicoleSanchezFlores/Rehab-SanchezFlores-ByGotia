@@ -174,10 +174,15 @@ ggplot(rehab, aes(x = ces_d, color = factor(home_label))) +
 
 -   Findings: This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
 
-##Introduction
+# Introduction
 
+Substance abuse and use disorders have been a major public health concern in the United States especially among those that have faced homelessness and mental health challenges. Prior research has found patterns associated with an individuals substance choice, though the research can be mixed in results. A systemic review focused on understanding drug use patterns from 2007 and 2020 found that alcohol still remains the most commonly used substance among individuals experiencing homelessness with psychoactive drug use increasing overtime (Coombs et al., 2024). They also found that substance abuse was generally more common among men due to mental health and trauma stressors (Coombs et al., 2024). In relation to gender, studies have mixed results on whether gender as a significant association with drug use. A study conducted in a Spanish shelter assessed whether there was a statistical difference in drug consumption between homeless men and women. They found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they did find that reason for inital drug use did differ with women starting due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors (Parés-Bayerri et al., 2023). Following the new thread of mental health comorbitity with drug use among those facing homelessness, a third and final study found that individuals experiencing homelessness that admit into services have higher frequency of drug use, and have higher rates of mental health comorbidity. Women in this population were also found to be highly associated with having mental health comorbidities tied with their drug use (Arnos & Acevedo, 2023).
 
-The data that will be used in this analysis comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. Note that age and ces-d scores were treated as continuous variables while gender and homelessness were treated as categorical variables.
+Based on this prior research our primary question then becomes:
+
+Does age, gender, depressive symptom scores, and homelessness predict primary substance type among adults receiving inpatient detoxification care?
+
+To address this question, we will utilize multinominal logistic regression which is an extension of binary logisitc regression due to our outcome of primary substance choice being nominal and non-ordinal (Bilder, 2015). The data that will be used in this analysis comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. Note that age and ces-d scores were treated as continuous variables while gender and homelessness were treated as categorical variables.
 
 ```{r}
 library(readr)
@@ -232,7 +237,7 @@ library(mosaic)
 
 ## Methodological Extension: Multinominal Logistic Regression
 
-After conducting our exploratory analysis we found that alcohol was the most frequently reported primary substance followed by cocaine and heroin. The other substance response options of none, barbituates, benzos, methadone, and opiates were not reported. Marijuana was also only reported once among the detoxification center population. Due to this sparsity the analysis was restricted to individuals that reported alcohol, cocaine, and heroin as their primary substance. Given the non-ordinal and multi-category nature of the primary substance outcome, a multinominal logistic regression model was therefore selected for our analysis (Bilder, 2015). Additionally, if binary logistic regression had been used in this instance it would have caused all substances to be collapsed into a single category which would prevent a deeper understanding of the substance-specific relationships between the explanatory variables.
+After conducting our exploratory analysis we found that alcohol was the most frequently reported primary substance followed by cocaine and heroin. The other substance response options of none, barbituates, benzos, methadone, and opiates were not reported (n = 0). Marijuana was also only reported once among the detoxification center population. Due to this sparsity the analysis was restricted to individuals that reported alcohol, cocaine, and heroin as their primary substance. Given the non-ordinal and multi-category nature of the primary substance outcome, a multinominal logistic regression model was therefore selected for our analysis (Bilder, 2015). Additionally, if binary logistic regression had been used in this instance it would have caused all substances to be collapsed into a single category which would prevent a deeper understanding of the substance-specific relationships between the explanatory variables.
 
 In a multinominal logistic regression model, a base-line category must be assigned to compare the association between age, gender, ces-d depression score, and homelessness status with choice of primary substance use. Our model utilizes alcohol as the base-line reference category due to its high response prevalence (n = 185) among individuals in the detoxification center compared to cocaine (n = 156) and heroin (n = 128).
 
@@ -254,9 +259,9 @@ table(filtered_rehab$prim_sub_label)
 
 The final cleaned dataset now only includes individuals with the primary substances of alcohol (n = 185), cocaine (n = 156), and heroin (n = 128), for a total sample size of N = 469.
 
-Next, the multinominal logistic regression model can be set up to examine the association between age, gender, homelessness status, and ces-d depression score with primary substance while using alcohol as the reference. Let $Y_i$ denote the primary substance for detoxification patient $i$. Since alcohol is being treated as the reference category each remaining substance $j \in$ {cocaine, heroin} will be modeled as: $$log(\frac{P(Y_i = j)}{P(Y_i = alcohol)}) = \beta_{0j} + \beta_{1j}(age_i) + \beta_{2j}(gender_i) + \beta_{3j}(homeless_i) + \beta_{4j}(ces-d_i)$$ This model creates an odds ratio comparison between alcohol and cocaine or heroin as it relates to the explanatory variables to test associations. 
+Next, the multinominal logistic regression model can be set up to examine the association between age, gender, homelessness status, and ces-d depression score with primary substance while using alcohol as the reference. Let $Y_i$ denote the primary substance for detoxification patient $i$. Since alcohol is being treated as the reference category each remaining substance $j \in$ {cocaine, heroin} will be modeled as: $$log(\frac{P(Y_i = j)}{P(Y_i = alcohol)}) = \beta_{0j} + \beta_{1j}(age_i) + \beta_{2j}(gender_i) + \beta_{3j}(homeless_i) + \beta_{4j}(ces-d_i)$$ This model creates an odds ratio comparison between alcohol and cocaine or heroin as it relates to the explanatory variables to test associations.
 
-To conduct multinominal logistic regression the `multinom()` function was used from the `nnet` package (Bruin, 2011). 
+To conduct multinominal logistic regression the `multinom()` function was used from the `nnet` package (Bruin, 2011).
 
 ```{r}
 library(nnet)
@@ -265,24 +270,20 @@ summary(mod.fit)
 
 ```
 
-The resulting fitted log-odds equations were: 
-Cocaine vs Alcohol
-$$log(\frac{\hat{\pi}_{cocaine}}{\hat{\pi}_{alcohol}}) = 2.967828 + 0.5151615(gender) - 0.06541560(age) - 0.6770603(homeless) -  0.03327985(ces-d)$$
-Heroin vs Alcohol
-$$log(\frac{\hat{\pi}_{heroin}}{\hat{\pi}_{alcohol}}) = 2.548504 + 0.2613997(gender) - 0.08280548(age) - 0.7872547(homeless) +  0.00319592(ces-d)$$
-These resulting coefficients are the changes in the log odds of choosing cocaine or heroin versus alcohol while holding all explanatory variables constant. The negative age coefficients in both models indicate that for each additional year there is an associated lower log odds of choosing cocaine versus alcohol and heroin versus alcohol. Homelessness shows a similar relationship with a "yes" response to being homeless is associated with lower log odds of cocaine and heroin use versus alcohol. However, CES-D is only negative for cocaine and not heroin indicating that depressive symptom scores are more strongly associated with decreased odds of cocaine use.
+The resulting fitted log-odds equations were: Cocaine vs Alcohol $$log(\frac{\hat{\pi}_{cocaine}}{\hat{\pi}_{alcohol}}) = 2.967828 + 0.5151615(gender) - 0.06541560(age) - 0.6770603(homeless) -  0.03327985(ces-d)$$ Heroin vs Alcohol $$log(\frac{\hat{\pi}_{heroin}}{\hat{\pi}_{alcohol}}) = 2.548504 + 0.2613997(gender) - 0.08280548(age) - 0.7872547(homeless) +  0.00319592(ces-d)$$ These resulting coefficients are the changes in the log odds of choosing cocaine or heroin versus alcohol while holding all explanatory variables constant. The negative age coefficients in both models indicate that for each additional year there is an associated lower log odds of choosing cocaine versus alcohol and heroin versus alcohol. Homelessness shows a similar relationship with a "yes" response to being homeless is associated with lower log odds of cocaine and heroin use versus alcohol. However, CES-D is only negative for cocaine and not heroin indicating that depressive symptom scores are more strongly associated with decreased odds of cocaine use.
 
-An ANOVA Type II test was then used to assess whether each explanatory variable is associated with each primary substance.  
+An ANOVA Type II test was then used to assess whether each explanatory variable is associated with each primary substance.
 
 ```{r}
 library(car)
 Anova(mod.fit)
 ```
 
-From the resulting deviance table it can be noted that age ($LR_{\chi^{2}}$ = 33.112, $p = 6.453e-08$), homelessness ($LR_{\chi^{2}}$ = 13.270, $p = 0.0013139$), and CES-D ($LR_{\chi^{2}}$ = 17.450, $p = 0.0001625$) are significantly associated with primary substance choice. However, gender was not statistically significant ($LR_{\chi^{2}}$ = 3.437, $p = 0.1793288$). This suggests that even if there is a difference in gender distribution among each primary substance of choice there is not enough evidence to conclude that this difference is significant for this research population. 
+From the resulting deviance table it can be noted that age ($LR_{\chi^{2}}$ = 33.112, $p = 6.453e-08$), homelessness ($LR_{\chi^{2}}$ = 13.270, $p = 0.0013139$), and CES-D ($LR_{\chi^{2}}$ = 17.450, $p = 0.0001625$) are significantly associated with primary substance choice. However, gender was not statistically significant ($LR_{\chi^{2}}$ = 3.437, $p = 0.1793288$). This suggests that even if there is a difference in gender distribution among each primary substance of choice there is not enough evidence to conclude that this difference is significant for this research population.
 
-##Results 
-To further assess the probability of choosing cocaine and heroin versus alcohol relative risk ratios were calculated.  
+# Results
+
+To further assess the probability of choosing cocaine and heroin versus alcohol relative risk ratios were calculated.
 
 ```{r}
 library(knitr)
@@ -313,16 +314,49 @@ kable(
 
 ```
 
-From the table, age showed a strong association for both cocaine and heroin relative to alcohol. For every additional year of age there was an associated  6.3% decrease in relative risk of cocaine versus alcohol and a 7.9% decrease in relative risk of heroin versus alcohol while holding gender, homelessness, and CES-D constant. (Write more)
+From the relative risk ratio table, age showed a strong association with both cocaine and heroin relative to alcohol while holding gender, homelessness, and CES-D score constant. For every additional year of age, there was an associated 6.3% decrease in the relative risk of cocaine versus alcohol and we are 95% confident that the true decrease lies between 3.4% and 9.1%. There was also a 7.9% decrease in relative risk of heroin versus alcohol and we are 95% confident that the true decrease lies between 4.9% and 10.9%. This suggests that younger patients in the detoxification center are relatively more likely to report cocaine or heroine use compared to alcohol.
 
-Predicted probabilities were then conducted to observe the absolute likelihood of choosing any of the primary substance outcomes (Bilder, 2015). 
+CES-D score also had a high association with choice of substance. For every additional 1 point score increase there is an associated 3.3% decrease in relative risk of cocaine versus alcohol with a 95% confidence interval where the true decrease lies between 1.5% and 5.1%. On the other hand, there was not a significant association between heroin versus alcohol since the risk ratio was close to one (1.003) and the confidence interval included 1 (-2.4% to 1.7%).
+
+Homelessness status also had an association with choice of primary substance. Patients that experienced homelessness had a 49.2% lower relative risk of choosing cocaine over alcohol when compared to those that were not homeless. They also had a 95% confidence interval of 32.3% to 67.7%. When it came to heroin versus alcohol, homelessness was associated with a 54.5% lower relative risk and a 95% confidence interval of 26.4% to 71.8%.
+
+These relative risk ratios indicate that characteristics like age, CES-D score, and homelessness status shift the relative likelihood of choosing any of the primary substance outcomes. Within the context of the detoxification center population this means that older patients and those facing homelessness are more likely to choose alcohol as their primary substance than cocaine or heroin.
+
+Predicted probabilities were then conducted to observe the absolute likelihood of choosing any of the primary substance outcomes (Bilder, 2015).
+
 ```{r}
+library(tidyr)
 pi.hat <- predict(object = mod.fit, newdata = filtered_rehab, type = "probs")
 head(pi.hat)
+
+pi_frame <- as.data.frame(pi.hat)
+
+pi_pivot <- pi_frame |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Substance",
+    values_to = "Probability"
+  )
+
+pi_table <- pi_pivot |>
+  group_by(Substance) |>
+  summarise(
+    mean_prob = mean(Probability),
+    min_prob = min(Probability),
+    max_prob = max(Probability)
+  )
+
+kable(
+  pi_table,
+  digits = 3,
+  caption = "Summary of the predicted probabilites by subtance"
+) |>
+  kable_styling(full_width = FALSE)
+
 ```
 
-For the first six individuals their predicated probabilities ranged from 0.207 to 0.51 for alcohol, 0.23 to 0.58 for cocaine, and 0.13 to 0.45 for heroin. These probability ranges indicate that the multinominal model does not predict the same probability of choosing a certain primary substance for everyone. Some have a higher predicted probability of choosing cocaine while for others it could be cocaine or heroin. This further supports that changes in a person's characteristics (age, homelessness, and CES-D score) can influence their probability of choosing a certain substance. 
+The table above summarizes the distribution of the predicted probabilities for each primary substance across all the patients that entered into the detoxification center. On average, alcohol had the highest average predicted probability (mean = 0.394) compared to cocaine (mean = 0.333) and heroin (mean = 0.273). Alcohol is therefore the most common primary substance to be chosen among the detoxification center population.
 
-(Add some kind of visualization)
-##Discussion 
+The ranges of predicted probabilities for each primary substance also reveals how individual characteristics influence the substance choice. The range for alcohol was 0.085 to 0.868 which indicates that some individuals based on their characteristics (age, gender, homelessness, and CES-D) where predicted to have a lower or higher likelihood of choosing alcohol. Similarly, the predicted probabilities for cocaine and heroin ranged from 0.063 to 0.717 and 0.043 to 0.549 respectively. Essentially, the predicted probabilities ranges show that the explanatory variables do not affect all individuals the same. They are shown to shift the relative likelihood of each substance based on an individual's combined characteristics.
 
+# Discussion
