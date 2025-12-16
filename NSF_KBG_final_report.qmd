@@ -1,7 +1,23 @@
-```{r}
+---
+title: "NSF_KBG_Written_Full_Report"
+format: pdf
+authors: Nicole Sanchez Flores, Kimberly By Gotia
+bibliography: references.bib
+---
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 library(readr)
 library(janitor)
 library(tidyverse)
+library(nnet)
+library(knitr)
+library(kableExtra)
+library(broom)
+library(dplyr)
+library(mosaic)
+library(car)
+library(reshape2)
 rehab <-read_csv("help.csv")
 rehab <- clean_names(rehab)
 
@@ -45,15 +61,19 @@ rehab <- rehab |> mutate(
       )
     )
 
-library(mosaic)
 #?HELPfull
+knitr::opts_chunk$set(
+echo = FALSE,
+message = FALSE,
+warning = FALSE
+)
 ```
 
-## **Data Description:**
+# Data Description
 
 -   The data that we will be using comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit.
 
-## **Question to Research:**
+# Research Question
 
 -   Do age, gender, depression score, and homelessness predict primary substance type?
 
@@ -61,7 +81,7 @@ library(mosaic)
 
 -   Outcomes: The first substance an individual at the detoxification center has taken (prim_sub).
 
-## **Descriptions of variables:**
+## **Variable Descriptions**
 
 -   Depression levels (ces_d)
 
@@ -71,23 +91,23 @@ library(mosaic)
 
     -   The primary substance in this data set refers to the first drug of choice for the patient in the detoxification center. The drugs are categorized by levels with 0 = none, 1 = alcohol, 2 = cocaine, 3 = heroin, 4 = barbiturates, 5 = benzos, 6 = marijuana, 7 = methadone, and 8 = opiates.
 
-## **References Summaries:**
+# Relevant Literature
 
-1.  [Understanding drug use patterns among the homeless population: A systematic review of quantitative studies](https://www.sciencedirect.com/science/article/pii/S2667118223000107)
+1.  [Understanding drug use patterns among the homeless population: A systematic review of quantitative studies](https://www.sciencedirect.com/science/article/pii/S2667118223000107) @coombs_2024_homeless_drug_patterns
 
     -   Summary: Researchers conducted a systematic review of quantitative studies from 2007 and 2020 to assess the trends associated with substance abuse among the global adult homeless population. They found that alcohol was a highly popular primary drug abuse substance, but overtime there was an emergence in psychoactive substance use as well. Substance abuse was also found to be more common among men due to mental health and trauma stressors.
 
-2.  [Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality](https://www.mdpi.com/2156748)
+2.  [Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality](https://www.mdpi.com/2156748) @pares_bayerri_2023_gender_nationality
 
     -   Summary: This paper focuses on a cross sectional study observing whether there is a statistical difference in drug consumption between homeless men and women in Spanish shelters. They also assess whether there is higher drug usage present among homeless Spanish nationals or immigrants. After conducting the study they found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they found that the reason behind initial drug use did differ. Women tended to initially use drugs due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors. We found the difference in initial drug use between men and women to be very interesting especially as we examine whether factors like depression score influence an individual's primary substance in the HELP data.
 
     -   Additionally, their investigation into whether or not there was a difference in drug risk among homeless Spanish nationals and immigrants found that Spanish nationals were statistically at a higher tendency of drug use compared to immigrants. This section of the research paper seemed compelling for future investigation of whether primary substance differs among homeless populations across the U.S depending on their geographic location. The HELP data does not account for geographic information at this time so for now this is more of a future expansion of our research.
 
-3.  [Homelessness and Gender: Differences in Characteristics and Comorbidity of Substance Use Disorders at Admission to Services](https://www.researchgate.net/publication/366312084_Homelessness_and_Gender_Differences_in_Characteristics_and_Comorbidity_of_Substance_Use_Disorders_at_Admission_to_Services)
+3.  [Homelessness and Gender: Differences in Characteristics and Comorbidity of Substance Use Disorders at Admission to Services](https://www.researchgate.net/publication/366312084_Homelessness_and_Gender_Differences_in_Characteristics_and_Comorbidity_of_Substance_Use_Disorders_at_Admission_to_Services) @arnos_acevedo_2022
 
     1.  Summary: Study focuses on examining the associations between homelessness, gender, the severity of substance use, and the presence of mental health comorbidity among individuals entering treatment for SUD. After conducting a logistic regression on the 2017 Treatment Episodes dataset they found that individuals experiencing homelessness that admit into services have a higher usage rate of cocaine and meth, have higher frequency of use, and have higher rates of mental health comorbidity. Among their population they also found that women experiencing homelessness were highly associated with having mental health comorbidities. This research study helped in answering a question that bubbled up from our reading of, "Differences in Drug Use among Persons Experiencing Homelessness According to Gender and Nationality" where they found different influential factors impact initial drug use between men and women. We believe that mental health could be a factor that influences primary substance use so finding a paper that observed higher mental health comorbidities among homeless women that use substances is helpful to our research.
 
-## **Exploration of Data:**
+# Exploratory Data Analysis
 
 **Depression levels (ces_d) general distribution count:**
 
@@ -99,7 +119,8 @@ ggplot(rehab, aes(x = ces_d)) +
 summary(rehab$ces_d)
 ```
 
--   Findings: The CES depression scores tend to peak towards the 30-40 score range. This indicates high frequency of mid-range depression symptoms among the population in the HELP data set. This mid-range score finding is also supported by the summary statistics for CES-D scores which indicate a mean of 32.86.
+-   **Findings** 
+The CES depression scores tend to peak towards the 30-40 score range. This indicates high frequency of mid-range depression symptoms among the population in the HELP data set. This mid-range score finding is also supported by the summary statistics for CES-D scores which indicate a mean of 32.86.
 
 **Primary substance (prim_sub) general distribution count:**
 
@@ -115,7 +136,8 @@ rehab |>
   count()
 ```
 
--   Findings: The primary substance with high usage rates among the HELP population is alcohol with the lowest being marijuana. Further information on the exact distribution counts can be found in the summary count of each primary substance group with alcohol having 185 users and marijuana only having 1. It should also be noted that responses to "None", "Barbiturates", "Benzos", "Methadone", and "Opiates" were left off because no patients in the detoxification center responded to those options as their primary substance.
+-   **Findings:** 
+The primary substance with high usage rates among the HELP population is alcohol with the lowest being marijuana. Further information on the exact distribution counts can be found in the summary count of each primary substance group with alcohol having 185 users and marijuana only having 1. It should also be noted that responses to "None", "Barbiturates", "Benzos", "Methadone", and "Opiates" were left off because no patients in the detoxification center responded to those options as their primary substance.
 
 **Depression Score in association with Primary Substance:**
 
@@ -129,7 +151,8 @@ ggplot(rehab, aes(x = factor(prim_sub_label), y = ces_d, fill = factor(prim_sub_
   theme(legend.position = "none")
 ```
 
--   Findings: After grouping depression score by the different primary substances used by the detoxification patients we found that alcohol tended to have a higher mean depression score (\>35) compared to cocaine and heroine. We also saw that in terms of variance cocaine had a wider range of variance extending to the highest score of 60 indicating a high instance of depression symptoms.
+-   **Findings:**
+After grouping depression score by the different primary substances used by the detoxification patients we found that alcohol tended to have a higher mean depression score (\>35) compared to cocaine and heroine. We also saw that in terms of variance cocaine had a wider range of variance extending to the highest score of 60 indicating a high instance of depression symptoms.
 
 **Depression Score in association with Gender:**
 
@@ -143,7 +166,8 @@ ggplot(rehab, aes(x = factor(gender_label), y = ces_d, fill = factor(gender_labe
   theme(legend.position = "none")
 ```
 
--   Findings: When evaluating the depression levels of men versus women in the detoxification center we found that women had a higher depression scores overall. Women had a mean score of \>35 compared to men who scored \~30.
+-   **Findings:**
+When evaluating the depression levels of men versus women in the detoxification center we found that women had a higher depression scores overall. Women had a mean score of \>35 compared to men who scored \~30.
 
 **Homelessness in association with Gender:**
 
@@ -157,7 +181,8 @@ ggplot(rehab, aes(x = factor(gender_label), fill = factor(home_label))) +
   theme_minimal() 
 ```
 
--   Findings: From this bar plot we can see that for both categories of homelessness men tend to be more represented overall in the HELP data set. However, within the male population there is a close tie between those that are homeless and those that are not. For women this is not the case. Women who are not homeless are at a higher proportion than those that are in the detoxification center.
+-   **Findings:** 
+From this bar plot we can see that for both categories of homelessness men tend to be more represented overall in the HELP data set. However, within the male population there is a close tie between those that are homeless and those that are not. For women this is not the case. Women who are not homeless are at a higher proportion than those that are in the detoxification center.
 
 **Depression Score and Homelessness grouped by Primary Substance:**
 
@@ -172,7 +197,8 @@ ggplot(rehab, aes(x = ces_d, color = factor(home_label))) +
   theme_minimal()
 ```
 
--   Findings: This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
+-   **Findings**
+This density chart shows the interaction between homelessness and depression score across different primary substances. From the plot we found an interesting relationship among the heroin drug use group. Detoxification patients who use heroin and are homeless tend to have a higher population representation in scoring a mid-high range depression score (30-40). Meanwhile, those that used heroin and were not homeless were more spread across 20-60.
 
 # Introduction
 
@@ -184,58 +210,9 @@ Does age, gender, depressive symptom scores, and homelessness predict primary su
 
 To address this question, we will utilize multinominal logistic regression which is an extension of binary logisitc regression due to our outcome of primary substance choice being nominal and non-ordinal (Bilder, 2015). The data that will be used in this analysis comes from the Health Evaluation and Linkage to Primary Care (HELP) study which was a clinical trial for adults receiving in-patient care at a detoxification unit. If patients did not have a primary care physician then they were randomized with the goal of linking to primary medical care. This clinical research data was approved by Institutional Review Board of Boston University Medical Center and is housed in the mosaic RStudio package. For our research focus we will be utilizing the explanatory variables a1 (gender represented by 1 = male and 2 = female), age, homeless (related to homeless status with 0 = no and 1 = yes), and ces_d (center for epidemiologic studies depression measure 0-60). Our chosen variables will help us determine the potential correlation between these factors and the chosen first drug of choice (prim_sub) for an individual in the detoxification unit. Note that age and ces-d scores were treated as continuous variables while gender and homelessness were treated as categorical variables.
 
-```{r}
-library(readr)
-library(janitor)
-library(tidyverse)
-rehab <-read_csv("help.csv")
-rehab <- clean_names(rehab)
 
-rehab <- rehab |> mutate(
-    prim_sub_label = factor(
-      prim_sub,
-      levels = 0:8,
-      labels = c(
-        "None",
-        "Alcohol",
-        "Cocaine",
-        "Heroin",
-        "Barbiturates",
-        "Benzos",
-        "Marijuana",
-        "Methadone",
-        "Opiates"
-        )
-      )
-    )
 
-rehab <- rehab |> mutate(
-    home_label = factor(
-      homeless,
-      levels = 0:1,
-      labels = c(
-        "No",
-        "Yes"
-        )
-      )
-    )
-
-rehab <- rehab |> mutate(
-    gender_label = factor(
-      a1,
-      levels = 1:2,
-      labels = c(
-        "Male",
-        "Female"
-        )
-      )
-    )
-
-library(mosaic)
-#?HELPfull
-```
-
-## Methodological Extension: Multinominal Logistic Regression
+# Methodological Extension: Multinominal Logistic Regression
 
 After conducting our exploratory analysis we found that alcohol was the most frequently reported primary substance followed by cocaine and heroin. The other substance response options of none, barbituates, benzos, methadone, and opiates were not reported (n = 0). Marijuana was also only reported once among the detoxification center population. Due to this sparsity the analysis was restricted to individuals that reported alcohol, cocaine, and heroin as their primary substance. Given the non-ordinal and multi-category nature of the primary substance outcome, a multinominal logistic regression model was therefore selected for our analysis (Bilder, 2015). Additionally, if binary logistic regression had been used in this instance it would have caused all substances to be collapsed into a single category which would prevent a deeper understanding of the substance-specific relationships between the explanatory variables.
 
@@ -244,7 +221,6 @@ In a multinominal logistic regression model, a base-line category must be assign
 To account for only alcohol, cocaine, and heroin in the regression the HELP data was cleaned by dropping all unnecessary category outcomes from the primary substance variable:
 
 ```{r}
-library(dplyr)
 rehab$prim_sub_label <- droplevels(rehab$prim_sub_label)
 
 filtered_rehab <- rehab |>
@@ -264,8 +240,7 @@ Next, the multinominal logistic regression model can be set up to examine the as
 To conduct multinominal logistic regression the `multinom()` function was used from the `nnet` package (Bruin, 2011).
 
 ```{r}
-library(nnet)
-mod.fit <- multinom(formula = prim_sub_label ~ a1 + age + homeless + ces_d, data = filtered_rehab)
+mod.fit <- multinom(formula = prim_sub_label ~ gender_label + age + home_label + ces_d, data = filtered_rehab)
 summary(mod.fit)
 
 ```
@@ -275,7 +250,6 @@ The resulting fitted log-odds equations were: Cocaine vs Alcohol $$log(\frac{\ha
 An ANOVA Type II test was then used to assess whether each explanatory variable is associated with each primary substance.
 
 ```{r}
-library(car)
 Anova(mod.fit)
 ```
 
@@ -286,11 +260,6 @@ From the resulting deviance table it can be noted that age ($LR_{\chi^{2}}$ = 33
 To further assess the probability of choosing cocaine and heroin versus alcohol relative risk ratios were calculated.
 
 ```{r}
-library(knitr)
-library(kableExtra)
-library(broom)
-library(dplyr)
-
 odds_model <- tidy(mod.fit, conf.int = TRUE, exponentiate = TRUE)
 
 odds_model <- odds_model |>
@@ -309,7 +278,7 @@ kable(
   odds_model,
   digits = 3,
   booktabs = TRUE, 
-  caption = "Odds ratios and 95% CI intervals for multinominal logisitc regression (alcohol as reference)."
+  caption = "Odds ratios and 95 percent CI intervals for multinominal logisitc regression (alcohol as reference)."
 ) |> kable_styling(full_width = FALSE)
 
 ```
@@ -325,7 +294,6 @@ These relative risk ratios indicate that characteristics like age, CES-D score, 
 Predicted probabilities were then conducted to observe the absolute likelihood of choosing any of the primary substance outcomes (Bilder, 2015).
 
 ```{r}
-library(tidyr)
 pi.hat <- predict(object = mod.fit, newdata = filtered_rehab, type = "probs")
 head(pi.hat)
 
@@ -359,4 +327,138 @@ The table above summarizes the distribution of the predicted probabilities for e
 
 The ranges of predicted probabilities for each primary substance also reveals how individual characteristics influence the substance choice. The range for alcohol was 0.085 to 0.868 which indicates that some individuals based on their characteristics (age, gender, homelessness, and CES-D) where predicted to have a lower or higher likelihood of choosing alcohol. Similarly, the predicted probabilities for cocaine and heroin ranged from 0.063 to 0.717 and 0.043 to 0.549 respectively. Essentially, the predicted probabilities ranges show that the explanatory variables do not affect all individuals the same. They are shown to shift the relative likelihood of each substance based on an individual's combined characteristics.
 
+
+## Predicted Probabilities
+
+## Predicted Probability Plot for Age
+```{r}
+newdat_age <- expand.grid(
+  age = seq(min(rehab$age, na.rm = TRUE),
+            max(rehab$age, na.rm = TRUE),
+            by = 1),
+  ces_d = mean(rehab$ces_d, na.rm = TRUE),
+  gender_label = "Male",
+  home_label = "Yes"
+)
+
+pp_age <- predict(mod.fit, newdata = newdat_age, type = "probs")
+# now we can convert log-odds into probabilities that sum to ,so we model-estimated probabilities of each substance choice.
+pp_df_age <- cbind(newdat_age, pp_age)
+# no we just combining into our data set pp_df <- cbind(newdat_age, pp)
+
+pp_long_age <- melt(
+  pp_df_age,
+  id.vars = "age",
+  measure.vars = c("Alcohol", "Cocaine", "Heroin"),
+  variable.name = "Substance",
+  value.name = "Probability"
+)
+
+ggplot(pp_long_age,
+       aes(x = age, y = Probability, color = Substance)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Predicted Prob. of Primary Substance by Age",
+    x = "Age",
+    y = "Predicted Probability"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+-   **Findings**
+Figure 1 shows a model-predicted probabilities of primary substance choice across age. When holding depression, gender, and homelessness constant, older individuals are substantially more likely to report alcohol as their primary substance.Younger individuals are more likely to report cocaine as their primary substance, whereas cocaine use declines with increasing age.Heroin use as a primary substance is concentrated among younger individuals and becomes increasingly unlikely at older ages.
+(Add some kind of visualization)
+
+## Predicted Probability of Primary Substance by Depression Score
+
+```{r}
+newdat_ces <- expand.grid(
+  ces_d = seq(0, 60, by = 1),
+  age = mean(rehab$age, na.rm = TRUE),
+  gender_label = "Male",
+  home_label = "Yes"
+)
+
+pp <- predict(mod.fit, newdata = newdat_ces, type = "probs")
+# now we can convert log-odds into probabilities that sum to ,so we model-estimated probabilities of each substance choice.
+pp_df <- cbind(newdat_ces, pp)
+# no we just combining into our data set pp_df <- cbind(newdat_ces, pp)
+
+pp_long <- melt(
+  pp_df,
+  id.vars = "ces_d",
+  measure.vars = c("Alcohol", "Cocaine", "Heroin"),
+  variable.name = "Substance",
+  value.name = "Probability"
+)
+#ggplot need us to melt
+ggplot(pp_long,
+       aes(x = ces_d, y = Probability, color = Substance)) +
+  geom_line(linewidth = 1) +
+  labs(
+    title = "Predicted Prob. of Primary Substance by Depression Score",
+    x = "CES-D Score",
+    y = "Predicted Probability"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.title = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+```
+
+-   **Findings**
+Figure 2 visuaizes the model-predicted probabilities of primary substance choice across levels of depressive symptom scores, while holding age, gender, and homelessness constant. As CES-D scores increase, the predicted probability of alcohol as the primary substance rises, while the probability of cocaine declines more rapidly. This is in contrast to the probability of heroin where it increases somewhat steadily but remains lower than alcohol throughout the range of depression scores. These results indicate that higher depressive symptom severity is associated with having alcohol as a primary substance  which may show that depression as an important predictor of substance choice for this study's population.
+
 # Discussion
+
+The purpose of this study was to examine whether age, gender, depression score (CES-D), and homelessness would predict primary substance type (alcohol, heroin, cocaine)  among adults receiving inpatient detoxification services in the HELP study. Using multinomial logistic regression, we assessed how these factors were associated with the likelihood of selecting alcohol, cocaine, or heroin as a primary substance, while adjusting for all other variables. These findings partially answer our research question, suggesting that some demographic and psychosocial factors play an important role in substance choice, but that gender differences observed descriptively may be explained by other variables. The results are as follows
+
+-   **Age:** 
+ One of the strongest predictors for primary substance type was age. In the multinomial regression, increasing age was associated with a 6.3% decrease in the relative risk of cocaine versus alcohol and a 7.9% decrease in the relative risk of heroin versus alcohol, holding gender, homelessness, and CES-D constant. We can see that this pattern is further illustrated in Figure 2, which displays model-predicted probabilities across age. When depression (in this case, the ``cs_d`` variable`, a measure of depressive symptoms), gender, and homelessness were held constant, older individuals were substantially more likely to report alcohol as their primary substance, while younger individuals were more likely to report cocaine or heroin. These findings suggest a pattern where cocaine and heroin drug use more prevalent at younger ages and alcohol use predominating at older ages. Perhaps there are more 
+
+
+-   **Depression score (CES-D):** 
+ Depression score was another significant predictor for primary substance type. Higher CES-D scores had an association with a lower relative risk of cocaine versus alcohol, however there was no significant association was observed for heroin versus alcohol. This is also supported by the predicted probability plot shown in Figure 1 demonstrating that as depressive symptom severity increases, alcohol becomes increasingly more likely to be the primary substance, while cocaine use declines sharply. Heroin probabilities remain relatively stable across the range of depression scores. In conjuction, these results suggest that alcohol use may be more strongly associated with higher depressive symptom burden than cocaine or heroin in this detoxification population.
+
+
+-   **Gender:** 
+ Though we explored gender differences in the exploratory data analysis, gender was not determined to be a statistically significant predictor of primary substance type in the multinominal regression. Perhaps, gender differences observed could be due to or mediated by other factors such as age, depression or homeless rather than gender in itself. This is in tandem with previous literature, where Parés-Bayerri et al (Parés-Bayerri et al, 2023), found that there were no strong difference in drug type use between men and women in the homeless population but there were differences in the path towards addictive behaviors. 
+
+-   **Homelessness:** 
+ Homelessness has a significant association with primary substance type in the adjusted model. Participants experiencing homelessness had lower relative risks of cocaine and heroin compared to alcohol, indicating that alcohol was disproportionately common among homeless participants. This finding aligns with prior literature suggesting that alcohol use disorders are highly prevalent among homeless populations. 
+
+
+# Limitations
+
+One glaring issue is the recency of the HELP study, which should beconsidered when interpreting the findings of this study. According to Schlunberg et al., 2022
+
+First, the HELP study data were collected in the early 2000s, and drug use patterns have changed substantially (partly due to the decriminalization and recreational legalization use of some drugs such as marijuana).
+National data released in 2025 from the Monitoring the Future (MTF) Panel Study indicate major shifts in substance use prevalence and ways of consumption among young adults, including historically low levels of alcohol use and historically high levels of cannabis use, vaping, and nicotine products in 2024 (@patrick_2025_mtf). In contrast, alcohol was the dominant primary substance in the HELP dataset, suggesting that the observed patterns may reflect substance use norms at the time of data collection rather than current trends.
+
+Second, newer substances and methods of using drugs such as vaping cannabis, nicotine pouches, delta-8 THC, and hallucinogens are not captured/noted in the HELP study. National data show sharp increases in these substances among young, early midlife, and late midlife adults between 2014 and 2024 (@patrick_2025_mtf). As a result, the generalizability of our findings to today's substance use behaviors is limited, more specifcally for younger cohorts whose substance use behaviors now differ substantially from those observed in the HELP population (who tended to be older).
+
+Third, the HELP study population consists of adults entering inpatient detoxification services, which represents a clinically severe and highly selected group, which is inherit to this study. Substance use behaviors in this population may differ from those in the general population sampled by national surveys such as MTF, which could explain the differences in drug use behaviors. For example, while alcohol use has reached historic lows nationally across multiple age groups, it may still remain highly prevalent among individuals entering treatment, which may partially explain the strong association between age, depression, and alcohol observed in this study.
+
+Finally, predicted probability plots are based on data generated on the model we created, where some variables are held constant. Though these plots are useful for interpretation and visualization, they may not represent actual individuals and should be interpreted as adjusted estimates rather than observed prevalences
+
+# Future Directions
+
+Several extensions of this analysis could further strengthen our understanding of substance use patterns in the HELP study. Future analyses using datasets that include individuals who report no primary substance could extend this approach which could prove useful in modeling  both substance reporting (whethere they had a primary substance) and substance choice Another next step would be to model the probability of reporting a specific primary substance versus not reporting that substance by potentially using a series of binary logistic regression models. Another distinction could be between type of drug in terms of classes, such as depressants, stimulants, psychedelics etc.
+
+Additionally, future analyses could examine interactions between key predictors, such as age by depression score or homelessness by gender, to investigate  whether associations differ may across/within subgroups. Given prior literature noting gender and mental health differences in how different groups reach substance use addictive behaviors, interaction effects may reveal patterns not captured by these main effects alone.
+
+Finally, there could be a more recent replication of this analysis using more recent datasets would be valuable given substantial shifts in substance use patterns over time. Applying similar modeling approaches to contemporary national surveys, such as the Monitoring the Future study, would allow for direct comparison and improve the external validity of the findings.
+
+# Conclusion
+
+This study examined whether age, gender, depression score, and homelessness predict primary substance type among adults entering inpatient detoxification services using the HELP study. By using multinomial logistic regression, we found that age, depression severity, and homelessness were significant predictors of primary substance choice, while gender was not associated after adjustment. Older individuals were more likely to report alcohol as their primary substance, whereas cocaine and heroin use were more common among younger individuals. Participants who had higher depression symptoms scores were associated with an increased likelihood of alcohol use when compared to cocaine, and homelessness was associated with a greater probability of alcohol use compared to other substances.
+
+Predicted probability analyses further supported these relationships by visualizing how substance choice may shift across age and depressiive symptom scores while holding other factors constant. By combining these findings both mental health and other factors such as homelessness should be considered when examining substance use patterns in treatment-seeking populations. Although the HELP data reflect substance use patterns from the early 2000s, the statisticl analyses used in this study may help with understanding how demographic and psychosocial factors shape primary substance choice rehab treatement.
+
+\newpage
+# References: 
