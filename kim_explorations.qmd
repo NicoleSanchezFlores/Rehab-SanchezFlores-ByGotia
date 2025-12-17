@@ -229,7 +229,7 @@ pi_table <- pi_pivot |>
 kable(
   pi_table,
   digits = 3,
-  caption = "Summary of the predicted probabilites by subtance"
+  caption = "Summary of the Predicted Probabilites by Substance"
 ) |>
   kable_styling(full_width = FALSE)
 
