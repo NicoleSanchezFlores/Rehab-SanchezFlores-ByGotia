@@ -156,7 +156,7 @@ table_1 <- filtered_rehab |>
 kable(
   table_1,
   digits = 2,
-  caption = "Table 1. Demographic Characterisitcs of Patient Sample (N = 469)") |>
+  caption = "Table 1. Demographic Characteristics of Patient Sample (N = 469)") |>
   kable_styling(full_width = FALSE)
 ```
 
