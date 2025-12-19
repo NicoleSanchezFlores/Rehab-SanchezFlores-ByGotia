@@ -63,7 +63,7 @@ warning = FALSE
 
 # Introduction
 
-Substance abuse and use disorders have been a major public health concern in the United States especially among those that have faced homelessness and mental health challenges. Prior research focused on the homeless population has found patterns associated with an individual's substance choice in relation to not only mental health, but also age and potentially gender. A systematic review focused on understanding drug use patterns from 2007 and 2020 found that alcohol still remains the most commonly used substance among individuals experiencing homelessness with psychoactive drug use increasing over time (Coombs et al., 2024). They also found that substance abuse was generally more common among men due to mental health and trauma stressors (Coombs et al., 2024). In relation to gender, studies have mixed results on whether gender is significantly associated association with drug use. A study conducted in a Spanish shelter assessed whether there was a statistical difference in drug consumption between homeless men and women. They found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they did find that the reason for initial drug use did differ with women starting due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors (Parés-Bayerri et al., 2023). Following the thread of mental health comorbidity with drug use among those facing homelessness, a third and final study found that individuals experiencing homelessness that admit into services not only have a higher frequency of drug use, but also higher rates of mental health comorbidity. Women in this population were specifically found to be highly associated with having mental health comorbidities tied with their drug use (Arnos & Acevedo, 2023).
+Substance abuse and use disorders have been a major public health concern in the United States especially among those that have faced homelessness and mental health challenges. Prior research focused on the homeless population has found patterns associated with an individual's substance choice in relation to not only mental health, but also age and potentially gender. A systematic review focused on understanding drug use patterns from 2007 and 2020 found that alcohol still remains the most commonly used substance among individuals experiencing homelessness with psychoactive drug use increasing over time (Coombs et al., 2024). They also found that substance abuse was generally more common among men due to mental health and trauma stressors (Coombs et al., 2024). In relation to gender, studies have mixed results on whether gender is significantly associated with drug use. A study conducted in a Spanish shelter assessed whether there was a statistical difference in drug consumption between homeless men and women. They found that there was not a statistically significant difference between men and women in their observed population in terms of their drug use. However, they did find that the reason for initial drug use did differ with women starting due to partner influence or lack of family affectivity while men initiated drug use because of personality or social factors (Parés-Bayerri et al., 2023). Following the thread of mental health comorbidity with drug use among those facing homelessness, a third and final study found that individuals experiencing homelessness that admit into services not only have a higher frequency of drug use, but also higher rates of mental health comorbidity. Women in this population were specifically found to be highly associated with having mental health comorbidities tied with their drug use (Arnos & Acevedo, 2023).
 
 Given the clinical and social consequences of substance use patterns, the goal of this analysis is to assess whether demographic and psycho-social characteristics are differentially associated with primary substance choice in this clinical population. The target population for this study therefore consists of adults receiving inpatient detoxification care. Within this population, we will be evaluating a range of individual demographic and psycho-social characteristics and their associations with primary substance use.
 
@@ -156,21 +156,21 @@ table_1 <- filtered_rehab |>
 kable(
   table_1,
   digits = 2,
-  caption = "Table 1. Demographic Characterisitcs of Patient Sample (N = 469)") |>
+  caption = "Table 1. Demographic Characteristics of Patient Sample (N = 469)") |>
   kable_styling(full_width = FALSE)
 ```
 
-The final cleaned sample now consists of 469 adults receiving inpatient detoxification care who reported alcohol (n = 185), cocaine (n = 156), or heroin (n = 128) as their primary substance of choice. Table 1 further summarizes the demographic characteristics of the study population. 
+The final cleaned sample now consists of 469 adults receiving inpatient detoxification care who reported alcohol (n = 185), cocaine (n = 156), or heroin (n = 128) as their primary substance of choice. Table 1 further summarizes the demographic characteristics of the study population.
 
-Type II likelihood ratio tests obtained from the `car` package were used to assess whether each explanatory variable was significantly associated with primary substance choice in the fitted multinomial logistic regression model. 
+Type II likelihood ratio tests obtained from the `car` package were used to assess whether each explanatory variable was significantly associated with primary substance choice in the fitted multinomial logistic regression model.
 
 ```{r}
 Anova(mod.fit)
 ```
 
-Based on the Type II likelihood ratio tests from the fitted multinomial logistic regression model, age ($LR_{\chi^{2}}$ = 33.112, $p = 6.453e-08$), homelessness ($LR_{\chi^{2}}$ = 13.270, $p = 0.0013139$), and CES-D ($LR_{\chi^{2}}$ = 17.450, $p = 0.0001625$) are significantly associated with primary substance choice. However, gender was not statistically significant ($LR_{\chi^{2}}$ = 3.437, $p = 0.1793288$). This suggests that age, homelessness, and depressive symptom scores are important predictors of primary substance choice. Meanwhile, there is insufficient evidence to conclude that gender is associated with substance choice. 
+Based on the Type II likelihood ratio tests from the fitted multinomial logistic regression model, age ($LR_{\chi^{2}}$ = 33.112, $p = 6.453e-08$), homelessness ($LR_{\chi^{2}}$ = 13.270, $p = 0.0013139$), and CES-D ($LR_{\chi^{2}}$ = 17.450, $p = 0.0001625$) are significantly associated with primary substance choice. However, gender was not statistically significant ($LR_{\chi^{2}}$ = 3.437, $p = 0.1793288$). This suggests that age, homelessness, and depressive symptom scores are important predictors of primary substance choice. Meanwhile, there is insufficient evidence to conclude that gender is associated with substance choice.
 
-To further assess these associations, relative risk ratios comparing cocaine and heroin to alcohol were calculated. 
+To further assess these associations, relative risk ratios comparing cocaine and heroin to alcohol were calculated.
 
 ```{r}
 rrr_model <- tidy(mod.fit, conf.int = TRUE, exponentiate = TRUE)
@@ -208,7 +208,6 @@ While relative risk ratios quantify marginal associations, predicted probabiliti
 
 ```{r}
 pi.hat <- predict(object = mod.fit, newdata = filtered_rehab, type = "probs")
-head(pi.hat)
 
 pi_frame <- as.data.frame(pi.hat)
 
@@ -230,7 +229,7 @@ pi_table <- pi_pivot |>
 kable(
   pi_table,
   digits = 3,
-  caption = "Summary of the predicted probabilites by subtance"
+  caption = "Summary of the Predicted Probabilites by Substance"
 ) |>
   kable_styling(full_width = FALSE)
 
@@ -238,9 +237,9 @@ kable(
 
 The table above summarizes the distribution of the predicted probabilities for each primary substance across all the patients that entered into the detoxification center. On average, alcohol had the highest average predicted probability (mean = 0.394) compared to cocaine (mean = 0.333) and heroin (mean = 0.273). Alcohol is therefore the most common predicted primary substance to be reported among the detoxification center population.
 
-The ranges of predicted probabilities for each primary substance also reveals how individual characteristics influence the substance choice. The range for alcohol was 0.085 to 0.868 which indicates that some individuals based on their characteristics (age, gender, homelessness, and CES-D) were predicted to have a lower or higher likelihood of choosing alcohol. Similarly, the predicted probabilities ranged from 0.063 to 0.717 for cocaine and 0.043 to 0.549 for heroin. These ranges demonstrate that the explanatory variables do not affect all individuals the same. Instead they shift the relative likelihood of each substance depending on an individual's combined characteristics. 
+The ranges of predicted probabilities for each primary substance also reveals how individual characteristics influence the substance choice. The range for alcohol was 0.085 to 0.868 which indicates that some individuals based on their characteristics (age, gender, homelessness, and CES-D) were predicted to have a lower or higher likelihood of choosing alcohol. Similarly, the predicted probabilities ranged from 0.063 to 0.717 for cocaine and 0.043 to 0.549 for heroin. These ranges demonstrate that the explanatory variables do not affect all individuals the same. Instead they shift the relative likelihood of each substance depending on an individual's combined characteristics.
 
-These results are most generalizable to adults similar to those in the HELP data set who are receiving inpatient detoxification care, particularly those reporting alcohol, cocaine, and heroin as their primary substance. 
+These results are most generalizable to adults similar to those in the HELP data set who are receiving inpatient detoxification care, particularly those reporting alcohol, cocaine, and heroin as their primary substance.
 
 ## Predicted Probabilities
 
